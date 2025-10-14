@@ -16,7 +16,6 @@ public class Program
         AddEntry,
         Read,
         Delete,
-        Update,
         Exit
     }
 
@@ -48,13 +47,8 @@ public class Program
                     break;
 
                 case MenuOptions.Delete:
-                    Console.WriteLine("Delete selected.");
-                    Console.ReadKey();
-                    break;
-
-                case MenuOptions.Update:
-                    Console.WriteLine("Update selected.");
-                    Console.ReadKey();
+                    Console.Clear();
+                    DeleteEntry();
                     break;
 
                 case MenuOptions.Exit:
@@ -119,6 +113,38 @@ public class Program
         }
     }
 
+    public static void DeleteEntry()
+    {
+        using (var context = new PhoneBookContext())
+        {
+            AnsiConsole.MarkupLine("[bold yellow]Delete Entry[/]");
+            ReadEntries();
+            Console.WriteLine("Enter the ID of the entry to delete:");
+
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var entry = context.Phonebooks.Find(id);
+                if (entry != null)
+                {
+                    context.Phonebooks.Remove(entry);
+                    context.SaveChanges();
+                    AnsiConsole.MarkupLine("[green]Entry deleted successfully![/]");
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Entry not found.[/]");
+                }
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Invalid ID format.[/]");
+            }
+
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
+        }
+    }
+
     public static string EmailInput()
     {
         string email;
@@ -145,7 +171,7 @@ public class Program
         string phoneNumber;
         while (true)
         {
-            Console.WriteLine("Enter phohne number (must be 11 digits):");
+            Console.WriteLine("Enter phone number (must be 11 digits):");
             phoneNumber = Console.ReadLine();
 
             if (phoneNumber.Length == 11 && long.TryParse(phoneNumber, out _))
