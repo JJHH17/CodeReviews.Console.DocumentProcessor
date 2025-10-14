@@ -14,7 +14,7 @@ public class Phonebook
 public class PhoneBookContext : DbContext
 {
     private static readonly string server = ConfigurationManager.AppSettings["Server"];
-    private static readonly string databaseInstance = ConfigurationManager.AppSettings["DatabaseInstance"];
+    private static readonly string databaseInstance = ConfigurationManager.AppSettings["DatabaseName"];
     public static string connectionString = $@"Server=({server})\{databaseInstance};Integrated Security=true;";
 
     public DbSet<Phonebook> Phonebooks { get; set; }
