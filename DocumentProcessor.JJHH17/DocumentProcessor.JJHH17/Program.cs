@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
 
@@ -21,6 +21,16 @@ public class Program
 
     public static void Menu()
     {
+        // Seeds data if database is empty
+        using (var context = new PhoneBookContext())
+        {
+            if (!context.Phonebooks.Any())
+            {
+                SeedCSVData();
+            }
+        }
+
+
         bool running = true;
         while (running)
         {
@@ -185,5 +195,48 @@ public class Program
         }
 
         return phoneNumber;
+    }
+
+    public static List<string[]> ReadCSVFile(string filePath)
+    {
+        List<string[]> rows = new List<string[]>();
+
+        try
+        {
+            string[] lines = File.ReadAllLines(filePath);
+
+            foreach (var line in lines)
+            {
+                var values = line.Split(',');
+                rows.Add(values);
+            }
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error reading file: {ex.Message}[/]");
+        }
+
+        return rows;
+    }
+
+    public static void SeedCSVData()
+    {
+        string csvFilePath = "Import Data - Sheet1.csv";
+        List<string[]> csvData = ReadCSVFile(csvFilePath);
+
+        foreach (string[] row  in csvData)
+        {
+            using (var context = new PhoneBookContext())
+            {
+                var newEntry = new Phonebook
+                {
+                    Name = row[0],
+                    Email = row[1],
+                    PhoneNumber = row[2]
+                };
+                context.Phonebooks.Add(newEntry);
+                context.SaveChanges();
+            }
+        }
     }
 }
