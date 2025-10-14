@@ -41,7 +41,9 @@ public class Program
                     break;
 
                 case MenuOptions.Read:
-                    Console.WriteLine("Read selected.");
+                    Console.Clear();
+                    ReadEntries();
+                    Console.WriteLine("Press any key to return to the menu..."); 
                     Console.ReadKey();
                     break;
 
@@ -88,6 +90,33 @@ public class Program
         AnsiConsole.MarkupLine("[green]Entry added successfully![/]");
         Console.WriteLine("Press any key to return to the menu...");
         Console.ReadKey();
+    }
+
+    public static void ReadEntries()
+    {
+        using (var context = new PhoneBookContext())
+        {
+            var query = context.Phonebooks.ToList();
+
+            if (query.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[yellow]No entries were found[/]");
+            }
+            else
+            {
+                var table = new Table();
+                table.AddColumn("ID");
+                table.AddColumn("Name");
+                table.AddColumn("Email");
+                table.AddColumn("Phone Number");
+
+                foreach (var entry in query)
+                {
+                    table.AddRow(entry.Id.ToString(), entry.Name, entry.Email, entry.PhoneNumber);
+                }
+                AnsiConsole.Write(table);
+            }
+        }
     }
 
     public static string EmailInput()
