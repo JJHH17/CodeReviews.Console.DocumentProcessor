@@ -1,9 +1,10 @@
 ﻿using System;
+using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
 
 namespace DocumentProcessor.JJHH17;
 
-public class Program
+public class Program 
 {
     public static void Main(string[] args)
     {
@@ -35,8 +36,8 @@ public class Program
             switch (choice)
             {
                 case MenuOptions.AddEntry:
-                    Console.WriteLine("Add Entry selected.");
-                    Console.ReadKey();
+                    Console.Clear();
+                    AddEntry();
                     break;
 
                 case MenuOptions.Read:
@@ -61,5 +62,73 @@ public class Program
                     break;
             }
         }
+    }
+
+    public static void AddEntry()
+    {
+        AnsiConsole.MarkupLine("[bold yellow]Add Entry[/]");
+        Console.WriteLine("Enter name:");
+        string name = Console.ReadLine();
+        string email = EmailInput();
+        string phoneNumber = PhoneNumberInput();
+
+        using (var context = new PhoneBookContext())
+        {
+            var newEntry = new Phonebook
+            {
+                Name = name,
+                Email = email,
+                PhoneNumber = phoneNumber
+            };
+
+            context.Phonebooks.Add(newEntry);
+            context.SaveChanges();
+        }
+
+        AnsiConsole.MarkupLine("[green]Entry added successfully![/]");
+        Console.WriteLine("Press any key to return to the menu...");
+        Console.ReadKey();
+    }
+
+    public static string EmailInput()
+    {
+        string email;
+        while (true)
+        {
+            Console.WriteLine("Enter email address:");
+            email = Console.ReadLine();
+
+            if (email.Contains("@") && email.Contains("."))
+            {
+                break;
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Invalid email format. Please try again.[/]");
+            }
+        }
+
+        return email;
+    }
+
+    public static string PhoneNumberInput()
+    {
+        string phoneNumber;
+        while (true)
+        {
+            Console.WriteLine("Enter phohne number (must be 11 digits):");
+            phoneNumber = Console.ReadLine();
+
+            if (phoneNumber.Length == 11 && long.TryParse(phoneNumber, out _))
+            {
+                break;
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Invalid phone number. Please enter exactly 11 digits.[/]");
+            }
+        }
+
+        return phoneNumber;
     }
 }
