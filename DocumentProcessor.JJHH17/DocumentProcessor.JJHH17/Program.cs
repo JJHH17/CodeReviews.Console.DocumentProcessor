@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
+using CsvHelper;
 
 namespace DocumentProcessor.JJHH17;
 
@@ -16,6 +17,7 @@ public class Program
         AddEntry,
         Read,
         Delete,
+        Export,
         Exit
     }
 
@@ -59,6 +61,13 @@ public class Program
                 case MenuOptions.Delete:
                     Console.Clear();
                     DeleteEntry();
+                    break;
+
+                case MenuOptions.Export:
+                    Console.Clear();
+                    CreateExportCSV();
+                    Console.WriteLine("Enter any key to return to the menu...");
+                    Console.ReadKey();
                     break;
 
                 case MenuOptions.Exit:
@@ -238,5 +247,20 @@ public class Program
                 context.SaveChanges();
             }
         }
+    }
+
+    public static void CreateExportCSV()
+    {
+        using (var context = new PhoneBookContext())
+        {
+            var entries = context.Phonebooks.ToList();
+            using (var writer = new StreamWriter("ExportedPhonebook.pdf"))
+            using (var csv = new CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(entries);
+            }
+        }
+        AnsiConsole.MarkupLine("[green]Data exported to ExportedPhonebook.pdf successfully![/]");
+        AnsiConsole.MarkupLine("[green]You can find the CSV in 'CodeReviews.Console.DocumentProcessor\\DocumentProcessor.JJHH17\\DocumentProcessor.JJHH17\\bin\\Debug\\net8.0\\ExportedPhonebook.pdf\'[/]");
     }
 }
