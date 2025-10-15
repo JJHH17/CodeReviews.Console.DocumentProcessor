@@ -263,7 +263,7 @@ public class Program
         return rows;
     }
 
-    public static List<string[]> ReadXlsx(string filePath)
+    public static List<string[]> ReadExcel(string filePath)
     {
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         
@@ -314,6 +314,10 @@ public class Program
                     context.SaveChanges();
                 }
             }
+
+            AnsiConsole.MarkupLine("[green]Database seeded successfully from CSV![/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
         catch (Exception ex)
         {
@@ -325,12 +329,12 @@ public class Program
 
     public static void SeedXLSData()
     {
-        string xlsFilePath = "Import Data - Sheet1.xls";
-        List<string[]> xlsData = ReadFile(xlsFilePath);
-
-        foreach (string[] row in xlsData)
+        try
         {
-            using (var context = new PhoneBookContext())
+            string xlsFilePath = "Import Data - Sheet1.xls";
+            var xlsData = ReadExcel(xlsFilePath);
+            using var context = new PhoneBookContext();
+            foreach (var row in xlsData)
             {
                 var newEntry = new Phonebook
                 {
@@ -339,8 +343,17 @@ public class Program
                     PhoneNumber = row[2]
                 };
                 context.Phonebooks.Add(newEntry);
-                context.SaveChanges();
             }
+            context.SaveChanges();
+            AnsiConsole.MarkupLine("[green]Database seeded successfully from XLS![/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error reading XLS file: {ex.Message}[/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
     }
 
@@ -349,7 +362,7 @@ public class Program
         try
         {
             string xlsxFilePath = "Import Data - Sheet1.xlsx";
-            var xlsxData = ReadXlsx(xlsxFilePath);
+            var xlsxData = ReadExcel(xlsxFilePath);
 
             using var context = new PhoneBookContext();
             foreach (var row in xlsxData)
@@ -364,6 +377,9 @@ public class Program
             }
 
             context.SaveChanges();
+            AnsiConsole.MarkupLine("[green]Database seeded successfully from XLSX![/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         } 
         catch (Exception ex)
         {
