@@ -2,6 +2,8 @@
 using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
 using CsvHelper;
+using System.Data;
+using ExcelDataReader;
 
 namespace DocumentProcessor.JJHH17;
 
@@ -232,7 +234,7 @@ public class Program
                 SeedXLSData();
                 break;
             case FileTypes.XLSX:
-                AnsiConsole.MarkupLine("[red]XLSX import not implemented yet.[/]");
+                SeedXLSXData();
                 break;
         }
     }
@@ -261,24 +263,63 @@ public class Program
         return rows;
     }
 
+    public static List<string[]> ReadXlsx(string filePath)
+    {
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        
+        using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read);
+        using var reader = ExcelReaderFactory.CreateReader(stream);
+
+        var dataset = reader.AsDataSet(new ExcelDataSetConfiguration
+        {
+            ConfigureDataTable = _ => new ExcelDataTableConfiguration
+            {
+                UseHeaderRow = true
+            }
+        });
+
+        var table = dataset.Tables[0];
+        var rows = new List<string[]>();
+
+        foreach (DataRow dr in table.Rows)
+        {
+            var name = dr["Name"].ToString()?.Trim();
+            var email = dr["Email"].ToString()?.Trim();
+            var phoneNumber = dr["PhoneNumber"].ToString()?.Trim();
+
+            rows.Add(new string[] { name, email, phoneNumber });
+        }
+
+        return rows;
+    }
+
     public static void SeedCSVData()
     {
-        string csvFilePath = "Import Data - Sheet1.csv";
-        List<string[]> csvData = ReadFile(csvFilePath);
-
-        foreach (string[] row  in csvData)
+        try
         {
-            using (var context = new PhoneBookContext())
+            string csvFilePath = "Import Data - Sheet1.csv";
+            List<string[]> csvData = ReadFile(csvFilePath);
+
+            foreach (string[] row in csvData)
             {
-                var newEntry = new Phonebook
+                using (var context = new PhoneBookContext())
                 {
-                    Name = row[0],
-                    Email = row[1],
-                    PhoneNumber = row[2]
-                };
-                context.Phonebooks.Add(newEntry);
-                context.SaveChanges();
+                    var newEntry = new Phonebook
+                    {
+                        Name = row[0],
+                        Email = row[1],
+                        PhoneNumber = row[2]
+                    };
+                    context.Phonebooks.Add(newEntry);
+                    context.SaveChanges();
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error reading CSV file: {ex.Message}[/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
     }
 
@@ -300,6 +341,35 @@ public class Program
                 context.Phonebooks.Add(newEntry);
                 context.SaveChanges();
             }
+        }
+    }
+
+    public static void SeedXLSXData()
+    {
+        try
+        {
+            string xlsxFilePath = "Import Data - Sheet1.xlsx";
+            var xlsxData = ReadXlsx(xlsxFilePath);
+
+            using var context = new PhoneBookContext();
+            foreach (var row in xlsxData)
+            {
+                var newEntry = new Phonebook
+                {
+                    Name = row[0],
+                    Email = row[1],
+                    PhoneNumber = row[2]
+                };
+                context.Phonebooks.Add(newEntry);
+            }
+
+            context.SaveChanges();
+        } 
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error reading XLSX file: {ex.Message}[/]");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
     }
 
