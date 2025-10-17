@@ -1,5 +1,6 @@
 ﻿using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
+using Document.Processor.JJHH17.DataSeeding;
 
 namespace DocumentProcessor.JJHH17.UserInterface;
 
@@ -21,7 +22,7 @@ public class UserInterface
         {
             if (!context.Phonebooks.Any())
             {
-                Program.SeedOption();
+                DataSeeding.SeedOption();
             }
         }
 
