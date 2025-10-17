@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Document.Processor.JJHH17.DataSeeding;
 
-public class DataSeeding
+public class DataSeed
 {
     enum FileTypes
     {
