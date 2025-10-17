@@ -60,7 +60,7 @@ public class UserInterface
 
                 case MenuOptions.Export:
                     Console.Clear();
-                    DataExport.CreateExportCSV();
+                    DataExport.ExportMenu();
                     Console.WriteLine("Enter any key to return to the menu...");
                     Console.ReadKey();
                     break;
