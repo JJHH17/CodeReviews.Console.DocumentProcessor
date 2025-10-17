@@ -1,6 +1,7 @@
 ﻿using DocumentProcessor.JJHH17.Models;
 using Spectre.Console;
 using Document.Processor.JJHH17.DataSeeding;
+using Document.Processor.JJHH17.DataExporting;
 
 namespace DocumentProcessor.JJHH17.UserInterface;
 
@@ -22,7 +23,7 @@ public class UserInterface
         {
             if (!context.Phonebooks.Any())
             {
-                DataSeeding.SeedOption();
+                DataSeed.SeedOption();
             }
         }
 
@@ -59,7 +60,7 @@ public class UserInterface
 
                 case MenuOptions.Export:
                     Console.Clear();
-                    Program.CreateExportCSV();
+                    DataExport.CreateExportCSV();
                     Console.WriteLine("Enter any key to return to the menu...");
                     Console.ReadKey();
                     break;
