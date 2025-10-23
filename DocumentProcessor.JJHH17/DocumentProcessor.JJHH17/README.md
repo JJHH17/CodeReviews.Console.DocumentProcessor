@@ -7,6 +7,7 @@ This is a project that:
 - The user can seed data from an XLS, XLSX or CSV File (local file).
 - The user can export the databases items into a CSV, XLSX or CSV file, as well as exporting to an Azure Blob Storage instance.
 - The data seeding element of the application will only be presented to the user if the database contains 0 elements upon startup.
+- Finally, we also run an export of data based on a scheduled task, which by default is executed daily at 09:00 am (BST / GMT UK time).
 - Import and Export local files are stored in the following directory:
 
 ```JJHH17\bin\Debug\net8.0\```
@@ -19,6 +20,7 @@ This is a project that:
 - Excel Data Reader (package)
 - CSV Helper (CSV Writing Package)
 - Configuration Manager
+- CRONOS package - For running the file export on an automated basis.
 
 ## Usage Steps
 ### Creating an SQL Server Local DB Instance
@@ -77,6 +79,11 @@ Name     EmailAddress    TelephoneNumber
 ```JJHH17\bin\Debug\net8.0\```
 
 - Users can export as a CSV, PDF, or route the export to an Azure Blob Storage instance (more details on this found below).
+
+### Automated File Export
+- We use the CRONOS package for automating the export of the file export to a CSV file.
+- This runs daily at 9am (BST / GMT (UK local time)).
+- The class for this work can be found inside of the "Scheduled Export" folder.
 
 ### Azure Blob Storage Connection
 For data exporting, users can export the file to an Azure Blob instance.
